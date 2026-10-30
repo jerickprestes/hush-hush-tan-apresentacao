@@ -1,0 +1,579 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Hush Hush Tan: 2026 Shareholder Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=DM+Sans:wght@400;500;600;700&family=Playfair+Display:ital,wght@0,400;0,500;0,600;0,700;1,400;1,500;1,600;1,700&display=swap" rel="stylesheet">
+<style>
+  :root {
+    /* Palette (paleta_de_cores.jpg) */
+    --coral: #FF845E;
+    --bubble: #F5A9B8;      /* RGB 245,169,184 */
+    --jasmine: #FFE382;
+    --mint: #D7F9F1;
+    --tiffany: #9AD4D6;
+    --peri: #C9BBF4;
+    /* Text color: deep plum so every pastel stays readable */
+    --ink: #2D1B3F;
+
+    --serif: "Playfair Display", Georgia, "Times New Roman", serif;
+    --sans: "DM Sans", system-ui, -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+
+    --photo: url("https://images.pexels.com/photos/10600615/pexels-photo-10600615.jpeg?auto=compress&cs=tinysrgb&w=1260");
+    --s: 1; /* canvas scale, set by JS */
+  }
+
+  * { box-sizing: border-box; margin: 0; padding: 0; }
+  html, body { height: 100%; overflow: hidden; background: var(--ink); }
+  body { font-family: var(--sans); color: var(--ink); -webkit-font-smoothing: antialiased; user-select: none; -webkit-user-select: none; }
+  img { -webkit-user-drag: none; }
+
+  /* ---------- Deck mechanics ---------- */
+  .stage { position: fixed; inset: 0; overflow: hidden; touch-action: none; cursor: grab; }
+  .stage.dragging { cursor: grabbing; }
+  .track { display: flex; height: 100%; width: max-content; transition: transform .65s cubic-bezier(.65, 0, .25, 1); will-change: transform; }
+  .track.drag { transition: none; }
+
+  .slide { position: relative; flex: 0 0 100vw; width: 100vw; height: 100vh; height: 100dvh; overflow: hidden; background: var(--bg, var(--coral)); }
+
+  /* Fixed 1600×900 design canvas, scaled to fit the viewport */
+  .canvas {
+    position: absolute; left: 50%; top: 50%;
+    width: 1600px; height: 900px;
+    transform: translate(-50%, -50%) scale(var(--s));
+    transform-origin: center center;
+    padding: 84px 120px 120px;
+    display: flex; flex-direction: column;
+  }
+
+  /* ---------- Pattern bands (from the moodboard) ---------- */
+  .band { position: absolute; left: 0; right: 0; bottom: 0; height: calc(var(--s) * 64px); pointer-events: none; }
+  .band.stripes {
+    background: repeating-linear-gradient(90deg,
+      var(--b1) 0 calc(var(--s) * 34px),
+      var(--b2) calc(var(--s) * 34px) calc(var(--s) * 68px));
+  }
+  .band.hearts {
+    background: var(--b2, transparent);
+  }
+  .band.hearts::after {
+    content: ""; position: absolute; inset: 0;
+    background: var(--b1);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.6 4.5c2 0 3.7 1.1 5.4 3 1.700-1.900 3.400-3 5.400-3 3.600 0 5.800 3.800 4.200 7.300C19.500 16.400 12 21 12 21z'/%3E%3C/svg%3E") center / calc(var(--s) * 34px) calc(var(--s) * 34px) space no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.6 4.5c2 0 3.7 1.1 5.4 3 1.700-1.900 3.400-3 5.400-3 3.600 0 5.800 3.800 4.200 7.300C19.500 16.400 12 21 12 21z'/%3E%3C/svg%3E") center / calc(var(--s) * 34px) calc(var(--s) * 34px) space no-repeat;
+  }
+  .band.sprinkles {
+    background-color: var(--b2);
+    background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 64'%3E%3Cg%3E%3Crect x='12' y='10' width='24' height='7' rx='3.5' fill='%23FF845E' transform='rotate(-32 24 13)'/%3E%3Crect x='58' y='38' width='24' height='7' rx='3.5' fill='%23FFE382' transform='rotate(24 70 41)'/%3E%3Crect x='96' y='8' width='24' height='7' rx='3.5' fill='%239AD4D6' transform='rotate(-8 108 11)'/%3E%3Crect x='140' y='36' width='24' height='7' rx='3.5' fill='%23C9BBF4' transform='rotate(52 152 39)'/%3E%3Crect x='170' y='8' width='24' height='7' rx='3.5' fill='%23FF845E' transform='rotate(14 182 11)'/%3E%3Crect x='20' y='46' width='24' height='7' rx='3.5' fill='%239AD4D6' transform='rotate(70 32 49)'/%3E%3Crect x='112' y='48' width='24' height='7' rx='3.5' fill='%23D7F9F1' transform='rotate(-40 124 51)'/%3E%3C/g%3E%3C/svg%3E");
+    background-size: calc(var(--s) * 200px) calc(var(--s) * 64px);
+    background-repeat: repeat-x;
+  }
+
+  /* ---------- Typography ---------- */
+  h1, h2, h3 { font-family: var(--serif); font-weight: 600; line-height: 1.04; letter-spacing: -0.01em; }
+  h2 { font-size: 70px; max-width: 1150px; }
+  .lede { font-size: 28px; line-height: 1.45; font-weight: 500; max-width: 980px; margin-top: 22px; }
+  .note { font-size: 20px; font-weight: 500; opacity: .85; }
+  .chip { display: inline-flex; align-items: center; padding: 10px 22px; border-radius: 999px; font-weight: 700; font-size: 22px; background: var(--chip, var(--jasmine)); }
+
+  /* ---------- Slide 1: cover ---------- */
+  .cover { flex-direction: row; align-items: center; justify-content: space-between; gap: 60px; padding-top: 70px; }
+  .cover .copy { flex: 1; }
+  .logo { display: block; width: 520px; height: auto; color: var(--ink); }
+  .cover h1 { font-size: 118px; font-weight: 700; line-height: .98; margin: 40px 0 26px -4px; }
+  .cover .sub { font-family: var(--serif); font-style: italic; font-size: 40px; font-weight: 500; line-height: 1.15; }
+  .cover .chips { display: flex; gap: 12px; margin-top: 34px; flex-wrap: nowrap; }
+  .cover .chip { white-space: nowrap; font-size: 20px; padding: 9px 18px; }
+  .photo-frame { position: relative; width: 500px; height: 640px; flex: none; border-radius: 250px 250px 40px 40px; overflow: hidden; background: var(--peri); box-shadow: 18px 18px 0 var(--jasmine); }
+  .photo-frame .photo { position: absolute; inset: 0; background: var(--photo) center / cover no-repeat; }
+
+  /* ---------- Slide 2: letter ---------- */
+  .letter { flex-direction: row; gap: 80px; align-items: stretch; padding-top: 96px; }
+  .letter .left { flex: 1.05; display: flex; flex-direction: column; }
+  .letter h2 { font-size: 84px; }
+  .letter .lede { margin-top: 30px; max-width: 700px; }
+  .letter .next { margin-top: auto; font-size: 24px; font-weight: 600; background: var(--mint); padding: 22px 28px; border-radius: 22px; line-height: 1.4; max-width: 700px; }
+  .letter .right { flex: .95; display: flex; flex-direction: column; justify-content: center; gap: 22px; }
+  .letter .right h3 { font-size: 36px; font-weight: 600; font-style: italic; margin-bottom: 4px; }
+  .front { padding: 26px 32px; border-radius: 26px; font-size: 27px; line-height: 1.3; font-weight: 600; background: var(--c); }
+
+  /* ---------- Slide 3: highlights ---------- */
+  .kpis { margin-top: 36px; display: grid; grid-template-columns: repeat(4, 1fr); grid-template-rows: 1fr 1fr; gap: 20px; flex: 1; }
+  .kpi { background: var(--c); border-radius: 28px; padding: 26px 30px; display: flex; flex-direction: column; justify-content: space-between; }
+  .kpi.wide { grid-column: span 2; }
+  .kpi .num { font-family: var(--serif); font-weight: 700; font-size: 82px; line-height: 1; }
+  .kpi.wide .num { font-size: 120px; }
+  .kpi .lbl { font-size: 25px; font-weight: 700; line-height: 1.2; }
+  .kpi .det { font-size: 21px; font-weight: 500; margin-top: 4px; }
+
+  /* ---------- Charts ---------- */
+  .split { display: flex; gap: 70px; flex: 1; margin-top: 18px; align-items: stretch; }
+  .split .chart { flex: 1.5; }
+  .split .aside { flex: 1; display: flex; flex-direction: column; justify-content: center; gap: 20px; }
+  .aside p { font-size: 28px; line-height: 1.45; font-weight: 500; }
+  .aside .card { background: var(--c, var(--mint)); border-radius: 26px; padding: 26px 30px; font-size: 25px; line-height: 1.4; font-weight: 500; }
+  .aside .card b { font-weight: 700; }
+
+  .vbars { display: flex; align-items: flex-end; gap: 26px; height: 100%; position: relative; }
+  .vbar { flex: 1; display: flex; flex-direction: column; align-items: center; justify-content: flex-end; height: 100%; }
+  .vbar .val { font-family: var(--serif); font-weight: 700; font-size: 42px; margin-bottom: 8px; }
+  .vbar .col { width: 100%; border-radius: 18px 18px 0 0; background: var(--c); }
+  .vbar .yr { font-weight: 700; font-size: 26px; margin-top: 14px; }
+  .vbar .mg { font-size: 21px; font-weight: 500; }
+
+  .hbars { display: flex; flex-direction: column; gap: 22px; justify-content: center; height: 100%; }
+  .hrow { display: grid; grid-template-columns: 300px 1fr; align-items: center; gap: 24px; }
+  .hrow .name { font-size: 27px; font-weight: 600; line-height: 1.2; text-align: right; }
+  .hrow .track-h { display: flex; align-items: center; gap: 16px; }
+  .hrow .fill { height: 62px; border-radius: 0 16px 16px 0; background: var(--c); flex: none; }
+  .hrow .v { font-family: var(--serif); font-weight: 700; font-size: 34px; white-space: nowrap; }
+  .hrow .v small { font-family: var(--sans); font-weight: 600; font-size: 22px; margin-left: 6px; }
+
+  .months { position: relative; height: 100%; }
+  .months .bars { display: flex; align-items: flex-end; gap: 12px; height: 100%; }
+  .months .m { flex: 1; display: flex; flex-direction: column; justify-content: flex-end; align-items: center; height: 100%; position: relative; }
+  .months .m .col { width: 100%; border-radius: 12px 12px 0 0; background: var(--c); }
+  .months .m .lab { font-weight: 700; font-size: 20px; margin-top: 10px; }
+  .months .m .val { font-family: var(--serif); font-weight: 700; font-size: 30px; margin-bottom: 6px; }
+  .months .avg { position: absolute; left: 0; right: 0; border-top: 3px dashed var(--ink); z-index: 2; }
+  .months .avg span { position: absolute; right: 0; bottom: 8px; font-weight: 700; font-size: 21px; background: var(--bg-lab, var(--jasmine)); padding: 0 8px; }
+
+  .press { display: flex; flex-wrap: wrap; gap: 12px; margin-top: 4px; }
+  .press .chip { font-family: var(--serif); font-weight: 600; font-size: 24px; }
+
+  /* ---------- Slide 9: campaign ---------- */
+  .campaign { flex-direction: row; gap: 70px; align-items: center; padding-top: 70px; }
+  .campaign .copy { flex: 1.1; }
+  .campaign h2 { font-size: 112px; font-weight: 700; line-height: .95; }
+  .campaign .tag { font-family: var(--serif); font-style: italic; font-size: 50px; font-weight: 500; margin: 22px 0 28px; }
+  .campaign .goals { display: flex; gap: 12px; flex-wrap: wrap; margin-bottom: 28px; }
+  .campaign p { font-size: 27px; line-height: 1.45; font-weight: 500; max-width: 760px; }
+  .campaign .photo-frame { width: 480px; height: 640px; border-radius: 40px 40px 240px 240px; box-shadow: -18px 18px 0 var(--mint); }
+  .campaign .photo-frame .photo { background-position: 28% center; }
+
+  /* ---------- Slides 10 & 11: lists ---------- */
+  .cards4 { margin-top: 38px; display: grid; grid-template-columns: repeat(2, 1fr); gap: 22px; flex: 1; }
+  .item { background: var(--c); border-radius: 30px; padding: 30px 38px; display: flex; flex-direction: column; justify-content: center; gap: 10px; }
+  .item h3 { font-size: 44px; font-weight: 700; }
+  .item p { font-size: 26px; line-height: 1.4; font-weight: 500; }
+
+  /* ---------- Slide 12: closing ---------- */
+  .closing { flex-direction: row; align-items: center; justify-content: space-between; gap: 60px; }
+  .closing .logo { width: 560px; margin-bottom: 40px; }
+  .closing h2 { font-size: 150px; font-weight: 700; line-height: .95; max-width: 900px; }
+  .closing .disc { margin-top: 44px; font-size: 22px; line-height: 1.5; font-weight: 500; max-width: 760px; background: var(--mint); padding: 20px 26px; border-radius: 20px; }
+  .heartgrid { display: grid; grid-template-columns: repeat(3, 150px); grid-auto-rows: 150px; gap: 0; flex: none; border-radius: 28px; overflow: hidden; }
+  .heartgrid i { display: block; background: var(--bgc); position: relative; }
+  .heartgrid i::after { content: ""; position: absolute; inset: 28px; background: var(--hc);
+    -webkit-mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.6 4.5c2 0 3.7 1.1 5.4 3 1.7-1.9 3.4-3 5.4-3 3.6 0 5.8 3.8 4.2 7.300C19.500 16.400 12 21 12 21z'/%3E%3C/svg%3E") center / contain no-repeat;
+            mask: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 24 24'%3E%3Cpath d='M12 21s-7.5-4.6-9.6-9.2C.8 8.3 3 4.5 6.6 4.5c2 0 3.7 1.1 5.4 3 1.7-1.9 3.4-3 5.4-3 3.6 0 5.8 3.8 4.2 7.300C19.500 16.400 12 21 12 21z'/%3E%3C/svg%3E") center / contain no-repeat; }
+
+  /* ---------- Navigation ---------- */
+  .nav { position: fixed; right: 22px; bottom: 16px; display: flex; align-items: center; gap: 10px; z-index: 10; }
+  .nav .count { font-weight: 700; font-size: 16px; background: var(--ink); color: var(--mint); padding: 10px 16px; border-radius: 999px; min-width: 76px; text-align: center; letter-spacing: .02em; }
+  .nav button { width: 44px; height: 44px; border-radius: 50%; border: 0; background: var(--ink); color: var(--mint); display: grid; place-items: center; cursor: pointer; transition: transform .15s, opacity .2s; }
+  .nav button:hover:not(:disabled) { transform: scale(1.08); }
+  .nav button:disabled { opacity: .3; cursor: default; }
+  .nav button:focus-visible { outline: 3px solid var(--jasmine); outline-offset: 2px; }
+  .nav svg { width: 20px; height: 20px; }
+
+  @media (prefers-reduced-motion: reduce) { .track { transition: none; } }
+</style>
+</head>
+<body>
+
+<svg width="0" height="0" style="position:absolute" aria-hidden="true"><symbol id="hht-logo" viewBox="0 0 600 50"><defs><clipPath id="ca"><rect x="440" y="0.5" width="165" height="49"/></clipPath></defs>
+  <g fill="none" stroke="currentColor" stroke-linecap="butt" stroke-linejoin="miter">
+    <path d="M1.7 0.5V49.5M46.3 0.5V49.5" stroke-width="3.4"/><path d="M1.7 23.76H46.3" stroke-width="2.8"/><path d="M56.7 0.5V26.70A22.30 22.30 0 0 0 101.3 26.70V0.5" stroke-width="3.4"/><path d="M149.6 13.5C149.6 6 141.2 1.9 130.5 1.9C119.5 1.9 111.7 6.5 111.7 13.2C111.7 21.5 150.8 25.5 150.8 35.5C150.8 43.5 142 48.7 131 48.7C119.8 48.7 109.7 44.5 109.7 32.6" stroke-width="3.4"/><path d="M161.7 0.5V49.5M206.3 0.5V49.5" stroke-width="3.4"/><path d="M161.7 23.76H206.3" stroke-width="2.8"/>
+    <g transform="translate(232 0)"><path d="M1.7 0.5V49.5M46.3 0.5V49.5" stroke-width="3.4"/><path d="M1.7 23.76H46.3" stroke-width="2.8"/><path d="M56.7 0.5V26.70A22.30 22.30 0 0 0 101.3 26.70V0.5" stroke-width="3.4"/><path d="M149.6 13.5C149.6 6 141.2 1.9 130.5 1.9C119.5 1.9 111.7 6.5 111.7 13.2C111.7 21.5 150.8 25.5 150.8 35.5C150.8 43.5 142 48.7 131 48.7C119.8 48.7 109.7 44.5 109.7 32.6" stroke-width="3.4"/><path d="M161.7 0.5V49.5M206.3 0.5V49.5" stroke-width="3.4"/><path d="M161.7 23.76H206.3" stroke-width="2.8"/></g>
+    <path d="M481.7 0.5V49.5" stroke-width="3.4"/><path d="M459 2.0H505" stroke-width="2.8"/><g clip-path="url(#ca)"><path d="M521.2 -2L493.4 54M521.2 -2L548.4 54" stroke-width="3.4"/><path d="M504 32.7H538" stroke-width="2.8"/></g><path d="M553.7 0.5V49.5M597.7 0.5V49.5" stroke-width="3.4"/><g clip-path="url(#ca)"><path d="M553.7 -0.5L597.7 50.5" stroke-width="3.4"/></g>
+  </g>
+</symbol></svg>
+<main class="stage" id="stage" aria-roledescription="carousel" aria-label="Hush Hush Tan 2026 Shareholder Report">
+  <div class="track" id="track">
+
+    <!-- 1. Cover -->
+    <section class="slide" style="--bg: var(--coral)" aria-label="Cover">
+      <div class="canvas cover">
+        <div class="copy">
+          <svg class="logo" viewBox="0 0 600 50" role="img" aria-label="Hush Hush Tan"><use href="#hht-logo"/></svg>
+          <h1>2026 Shareholder Report</h1>
+          <p class="sub">The Custom Glow, tailored to every skin tone and never artificial-looking.</p>
+          <div class="chips">
+            <span class="chip" style="--chip: var(--mint)">15 years in business</span>
+            <span class="chip" style="--chip: var(--bubble)">3 Texas studios</span>
+            <span class="chip" style="--chip: var(--peri)">3,000+ five-star reviews</span>
+          </div>
+        </div>
+        <div class="photo-frame" role="img" aria-label="Pink retro rotary phone, Pexels photo by cottonbro studio">
+          <div class="photo"></div>
+        </div>
+      </div>
+      <div class="band stripes" style="--b1: var(--bubble); --b2: var(--jasmine)"></div>
+    </section>
+
+    <!-- 2. Letter -->
+    <section class="slide" style="--bg: var(--jasmine)" aria-label="Letter to shareholders">
+      <div class="canvas letter">
+        <div class="left">
+          <h2>The best year of our journey</h2>
+          <p class="lede">Hush Hush Tan closes 2026 with 15 years of history. We kept the promise that brought us here: a personalized tan, tailored to every skin tone and never artificial-looking.</p>
+          <p class="next">For 2027, the focus is on consolidating profitability at our existing studios, scaling the at-home product line and preparing to open a fourth location.</p>
+        </div>
+        <div class="right">
+          <h3>Growth came from three fronts</h3>
+          <div class="front" style="--c: var(--coral)">Higher repeat visits across our three Texas studios</div>
+          <div class="front" style="--c: var(--tiffany)">Expansion of seasonal packages and bundles</div>
+          <div class="front" style="--c: var(--peri)">A stronger brand presence on social media, where human content from our team and clients drives new bookings</div>
+        </div>
+      </div>
+      <div class="band sprinkles" style="--b2: var(--bubble)"></div>
+    </section>
+
+    <!-- 3. Highlights -->
+    <section class="slide" style="--bg: var(--mint)" aria-label="Year highlights">
+      <div class="canvas">
+        <h2>Year highlights</h2>
+        <div class="kpis">
+          <div class="kpi wide" style="--c: var(--coral)">
+            <div><div class="lbl">Estimated revenue</div><div class="det">Up 15% from 2025</div></div>
+            <div class="num">$9.3M</div>
+          </div>
+          <div class="kpi" style="--c: var(--jasmine)">
+            <div><div class="lbl">EBITDA margin</div><div class="det">19% in 2025</div></div>
+            <div class="num">21%</div>
+          </div>
+          <div class="kpi" style="--c: var(--bubble)">
+            <div><div class="lbl">Appointments</div><div class="det">$55 average ticket</div></div>
+            <div class="num">168K</div>
+          </div>
+          <div class="kpi" style="--c: var(--peri)">
+            <div class="lbl">New clients</div>
+            <div class="num">41K</div>
+          </div>
+          <div class="kpi" style="--c: var(--tiffany)">
+            <div><div class="lbl">Repeat rate</div><div class="det">Clients back within 90 days</div></div>
+            <div class="num">61%</div>
+          </div>
+          <div class="kpi" style="--c: var(--jasmine)">
+            <div class="lbl">NPS</div>
+            <div class="num">74</div>
+          </div>
+          <div class="kpi" style="--c: var(--bubble)">
+            <div><div class="lbl">Google rating</div><div class="det">3,000+ five-star reviews</div></div>
+            <div class="num">4.9</div>
+          </div>
+        </div>
+      </div>
+      <div class="band hearts" style="--b1: var(--coral)"></div>
+    </section>
+
+    <!-- 4. Revenue -->
+    <section class="slide" style="--bg: var(--tiffany)" aria-label="Revenue and margin">
+      <div class="canvas">
+        <h2>Revenue more than doubled in five years</h2>
+        <p class="lede" style="margin-top: 14px">Annual revenue in $ millions, average growth of 17.8% per year. EBITDA margin rose from 12% to 21%.</p>
+        <div style="flex: 1; margin-top: 22px; min-height: 0;">
+          <div class="vbars" id="chart-revenue" role="img" aria-label="Bar chart of annual revenue from 4.1 million dollars in 2021 to 9.3 million in 2026 estimated"></div>
+        </div>
+        <p class="note" style="margin-top: 10px">2026E = full-year estimate. Fictional data.</p>
+      </div>
+      <div class="band stripes" style="--b1: var(--coral); --b2: var(--bubble)"></div>
+    </section>
+
+    <!-- 5. Studios -->
+    <section class="slide" style="--bg: var(--bubble)" aria-label="Performance by studio">
+      <div class="canvas">
+        <h2>Austin and Dallas generate 77% of revenue</h2>
+        <div class="split">
+          <div class="chart">
+            <div class="hbars" id="chart-studios" role="img" aria-label="Bar chart of 2026 estimated revenue by studio: Austin 3.9 million, Dallas 3.3 million, Houston 2.1 million"></div>
+          </div>
+          <div class="aside">
+            <p>Austin, our oldest location, remains the largest contributor. Houston, the youngest and fastest-growing studio, already adds 23% and is the main driver of expansion in the next cycle.</p>
+            <p class="note">2026E revenue by studio, total of $9.3 million. Fictional data.</p>
+          </div>
+        </div>
+      </div>
+      <div class="band hearts" style="--b1: var(--peri)"></div>
+    </section>
+
+    <!-- 6. Mix -->
+    <section class="slide" style="--bg: var(--mint)" aria-label="Service and product mix">
+      <div class="canvas">
+        <h2>The Custom Glow drives 58% of revenue</h2>
+        <div class="split">
+          <div class="chart">
+            <div class="hbars" id="chart-mix" role="img" aria-label="Bar chart of 2026 estimated revenue share: Custom Glow 58%, packages and bundles 21%, at-home products 11%, gift cards 7%, Student Glow Pass 3%"></div>
+          </div>
+          <div class="aside">
+            <div class="card" style="--c: var(--jasmine)">Packages and at-home products add another <b>32%</b>. The at-home line has a higher gross margin than services.</div>
+            <div class="card" style="--c: var(--peri)">Gift cards and the <b>$45 Student Glow Pass</b> work as an entry point for new clients.</div>
+            <p class="note">Share of 2026E revenue. Fictional data.</p>
+          </div>
+        </div>
+      </div>
+      <div class="band stripes" style="--b1: var(--peri); --b2: var(--bubble)"></div>
+    </section>
+
+    <!-- 7. Clients and brand -->
+    <section class="slide" style="--bg: var(--peri)" aria-label="Clients and brand">
+      <div class="canvas">
+        <h2>Instagram is our main acquisition channel</h2>
+        <div class="split">
+          <div class="chart">
+            <div class="hbars" id="chart-channels" role="img" aria-label="Bar chart of new client sources in 2026: Instagram and social media 34%, Google search and reviews 28%, referrals 19%, paid ads 11%, press and events 8%"></div>
+          </div>
+          <div class="aside">
+            <p>The brand is built on trust. Behind-the-scenes and real-client content converts best, combined with seasonal campaigns such as this year’s Halloween promotion, which brought our highest booking volume in October.</p>
+            <div class="press">
+              <span class="chip" style="--chip: var(--jasmine)">Vogue</span>
+              <span class="chip" style="--chip: var(--mint)">InStyle</span>
+              <span class="chip" style="--chip: var(--bubble)">D Magazine</span>
+              <span class="chip" style="--chip: var(--tiffany)">PaperCity</span>
+            </div>
+            <p class="note">Source of new clients in 2026E. Fictional data.</p>
+          </div>
+        </div>
+      </div>
+      <div class="band sprinkles" style="--b2: var(--mint)"></div>
+    </section>
+
+    <!-- 8. Seasonality -->
+    <section class="slide" style="--bg: var(--jasmine)" aria-label="Seasonality">
+      <div class="canvas">
+        <h2>Two demand peaks: March to June and December</h2>
+        <div class="split">
+          <div class="chart" style="flex: 1.7">
+            <div class="months" id="chart-months" role="img" aria-label="Bar chart of 2025 monthly revenue. March to June and December are the peaks; December is the best month at 930 thousand dollars; the average is 675 thousand dollars."></div>
+          </div>
+          <div class="aside" style="flex: 1">
+            <p>The business peaks in spring and summer, then again at year-end. December is the best month of the year at $930K.</p>
+            <p class="note">Monthly revenue in 2025, in $ thousands. Monthly bars are read from the original chart; only September, December and the average are labeled in the report. Fictional data.</p>
+          </div>
+        </div>
+      </div>
+      <div class="band stripes" style="--b1: var(--coral); --b2: var(--bubble)"></div>
+    </section>
+
+    <!-- 9. Holiday Glow -->
+    <section class="slide" style="--bg: var(--bubble)" aria-label="Holiday Glow campaign">
+      <div class="canvas campaign">
+        <div class="copy">
+          <h2>Holiday Glow</h2>
+          <p class="tag">Show up glowing</p>
+          <div class="goals">
+            <span class="chip" style="--chip: var(--jasmine)">First visits</span>
+            <span class="chip" style="--chip: var(--mint)">Packages</span>
+            <span class="chip" style="--chip: var(--peri)">Gift cards</span>
+          </div>
+          <p>Launched in 2026 to capture November and December demand, the campaign builds on our year-end peak, with December as the best month of the year.</p>
+        </div>
+        <div class="photo-frame" role="img" aria-label="Pink retro rotary phone, Pexels photo by cottonbro studio">
+          <div class="photo"></div>
+        </div>
+      </div>
+      <div class="band stripes" style="--b1: var(--coral); --b2: var(--jasmine)"></div>
+    </section>
+
+    <!-- 10. Outlook -->
+    <section class="slide" style="--bg: var(--mint)" aria-label="Outlook for 2027">
+      <div class="canvas">
+        <h2>Outlook for 2027</h2>
+        <div class="cards4">
+          <div class="item" style="--c: var(--coral)"><h3>Fourth location</h3><p>Feasibility study for a new studio in Texas, with a decision expected in the first half.</p></div>
+          <div class="item" style="--c: var(--jasmine)"><h3>At-home products</h3><p>Expand the portfolio and launch our own e-commerce store.</p></div>
+          <div class="item" style="--c: var(--peri)"><h3>Recurring revenue</h3><p>A monthly Glow subscription program to raise the repeat rate.</p></div>
+          <div class="item" style="--c: var(--bubble)"><h3>Brand</h3><p>Keep investing in organic content and reviews, our lowest-cost acquisition channels.</p></div>
+        </div>
+      </div>
+      <div class="band hearts" style="--b1: var(--bubble)"></div>
+    </section>
+
+    <!-- 11. Risks -->
+    <section class="slide" style="--bg: var(--coral)" aria-label="Risks and points of attention">
+      <div class="canvas">
+        <h2>Risks and points of attention</h2>
+        <div class="cards4">
+          <div class="item" style="--c: var(--jasmine)"><h3>Seasonality and social media</h3><p>Dependence on seasonal peaks and on social media for acquisition.</p></div>
+          <div class="item" style="--c: var(--mint)"><h3>Competition</h3><p>Other spray tan studios and self-tanning products.</p></div>
+          <div class="item" style="--c: var(--peri)"><h3>Rising costs</h3><p>Labor and supply costs are going up.</p></div>
+          <div class="item" style="--c: var(--bubble)"><h3>Consumer behavior</h3><p>Shifts in consumer behavior and in the perception of skincare.</p></div>
+        </div>
+      </div>
+      <div class="band sprinkles" style="--b2: var(--mint)"></div>
+    </section>
+
+    <!-- 12. Closing -->
+    <section class="slide" style="--bg: var(--peri)" aria-label="Closing">
+      <div class="canvas closing">
+        <div>
+          <svg class="logo" viewBox="0 0 600 50" role="img" aria-label="Hush Hush Tan"><use href="#hht-logo"/></svg>
+          <h2>Show up glowing.</h2>
+          <p class="disc">This report is fictional and does not represent the real financial situation of Hush Hush Tan. The data was created only to illustrate the format of a shareholder presentation.</p>
+        </div>
+        <div class="heartgrid" aria-hidden="true">
+          <i style="--bgc: var(--coral); --hc: var(--jasmine)"></i>
+          <i style="--bgc: var(--tiffany); --hc: var(--mint)"></i>
+          <i style="--bgc: var(--jasmine); --hc: var(--coral)"></i>
+          <i style="--bgc: var(--bubble); --hc: var(--peri)"></i>
+          <i style="--bgc: var(--mint); --hc: var(--tiffany)"></i>
+          <i style="--bgc: var(--coral); --hc: var(--bubble)"></i>
+          <i style="--bgc: var(--jasmine); --hc: var(--tiffany)"></i>
+          <i style="--bgc: var(--peri); --hc: var(--bubble)"></i>
+          <i style="--bgc: var(--tiffany); --hc: var(--jasmine)"></i>
+        </div>
+      </div>
+      <div class="band stripes" style="--b1: var(--bubble); --b2: var(--mint)"></div>
+    </section>
+
+  </div>
+</main>
+
+<nav class="nav" aria-label="Slide navigation">
+  <button id="prev" type="button" aria-label="Previous slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"/></svg></button>
+  <span class="count" id="count" aria-live="polite">1 / 12</span>
+  <button id="next" type="button" aria-label="Next slide"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2.6" stroke-linecap="round" stroke-linejoin="round"><path d="M9 5l7 7-7 7"/></svg></button>
+</nav>
+
+<script>
+(function () {
+  /* ---------- Charts ---------- */
+  var $ = function (id) { return document.getElementById(id); };
+
+  // Revenue by year (vertical bars)
+  var rev = [
+    { y: '2021', v: 4.1, m: '12% margin' }, { y: '2022', v: 5.2, m: '14% margin' },
+    { y: '2023', v: 6.3, m: '16% margin' }, { y: '2024', v: 7.3, m: '18% margin' },
+    { y: '2025', v: 8.1, m: '19% margin' }, { y: '2026E', v: 9.3, m: '21% margin', hi: true }
+  ];
+  var revH = 285; // px of bar at max value
+  $('chart-revenue').innerHTML = rev.map(function (d) {
+    var h = Math.round(d.v / 9.3 * revH);
+    return '<div class="vbar"><div class="val">' + d.v.toFixed(1) + '</div>' +
+      '<div class="col" style="height:' + h + 'px;--c:' + (d.hi ? 'var(--coral)' : 'var(--jasmine)') + '"></div>' +
+      '<div class="yr">' + d.y + '</div><div class="mg">' + d.m + '</div></div>';
+  }).join('');
+
+  // Horizontal bars
+  function hbars(id, rows, max, width) {
+    $(id).innerHTML = rows.map(function (r) {
+      return '<div class="hrow"><div class="name">' + r.n + '</div><div class="track-h">' +
+        '<div class="fill" style="width:' + Math.round(r.v / max * width) + 'px;--c:' + r.c + '"></div>' +
+        '<div class="v">' + r.l + (r.s ? '<small>' + r.s + '</small>' : '') + '</div></div></div>';
+    }).join('');
+  }
+  hbars('chart-studios', [
+    { n: 'Austin', v: 3.9, l: '$3.9M', s: '42%', c: 'var(--mint)' },
+    { n: 'Dallas', v: 3.3, l: '$3.3M', s: '35%', c: 'var(--mint)' },
+    { n: 'Houston', v: 2.1, l: '$2.1M', s: '23%', c: 'var(--jasmine)' }
+  ], 3.9, 440);
+  hbars('chart-mix', [
+    { n: 'Custom Glow (sessions)', v: 58, l: '58%', c: 'var(--coral)' },
+    { n: 'Packages and bundles', v: 21, l: '21%', c: 'var(--jasmine)' },
+    { n: 'At-home products', v: 11, l: '11%', c: 'var(--jasmine)' },
+    { n: 'Gift cards', v: 7, l: '7%', c: 'var(--jasmine)' },
+    { n: 'Student Glow Pass', v: 3, l: '3%', c: 'var(--jasmine)' }
+  ], 58, 420);
+  hbars('chart-channels', [
+    { n: 'Instagram and social media', v: 34, l: '34%', c: 'var(--coral)' },
+    { n: 'Google search and reviews', v: 28, l: '28%', c: 'var(--jasmine)' },
+    { n: 'Referrals', v: 19, l: '19%', c: 'var(--jasmine)' },
+    { n: 'Paid ads', v: 11, l: '11%', c: 'var(--jasmine)' },
+    { n: 'Press and events', v: 8, l: '8%', c: 'var(--jasmine)' }
+  ], 34, 420);
+
+  // Monthly revenue 2025 ($ thousands). Values other than Sep (570), Dec (930) and the average (675)
+  // are read from the original chart and are approximate; only the labeled ones are shown as numbers.
+  var months = [
+    ['Jan', 480], ['Feb', 520], ['Mar', 740, 1], ['Apr', 690, 1], ['May', 790, 1], ['Jun', 730, 1],
+    ['Jul', 660], ['Aug', 600], ['Sep', 570, 0, 1], ['Oct', 650], ['Nov', 740], ['Dec', 930, 1, 1]
+  ];
+  var mH = 370, mScale = mH / 930;
+  $('chart-months').innerHTML =
+    '<div class="avg" style="bottom:' + Math.round(675 * mScale + 36) + 'px"><span>avg $675K</span></div>' +
+    '<div class="bars">' + months.map(function (m) {
+      var h = Math.round(m[1] * mScale);
+      return '<div class="m">' + (m[3] ? '<div class="val">' + m[1] + '</div>' : '') +
+        '<div class="col" style="height:' + h + 'px;--c:' + (m[2] ? 'var(--coral)' : 'var(--tiffany)') + '"></div>' +
+        '<div class="lab">' + m[0] + '</div></div>';
+    }).join('') + '</div>';
+
+  /* ---------- Deck engine ---------- */
+  var stage = $('stage'), track = $('track'), slides = Array.prototype.slice.call(track.children);
+  var prev = $('prev'), next = $('next'), count = $('count');
+  var n = slides.length, i = 0, dx = 0;
+
+  function scale() {
+    document.documentElement.style.setProperty('--s', Math.min(window.innerWidth / 1600, window.innerHeight / 900));
+  }
+  function render() {
+    track.style.transform = 'translateX(' + (-i * window.innerWidth + dx) + 'px)';
+    count.textContent = (i + 1) + ' / ' + n;
+    prev.disabled = i === 0; next.disabled = i === n - 1;
+    slides.forEach(function (s, k) {
+      if (k === i) { s.removeAttribute('aria-hidden'); s.removeAttribute('inert'); }
+      else { s.setAttribute('aria-hidden', 'true'); s.setAttribute('inert', ''); }
+    });
+  }
+  function go(k) { i = Math.max(0, Math.min(n - 1, k)); dx = 0; track.classList.remove('drag'); render(); }
+
+  // Keyboard
+  window.addEventListener('keydown', function (e) {
+    if (e.key === 'ArrowRight' || e.key === 'PageDown' || e.key === ' ') { e.preventDefault(); go(i + 1); }
+    else if (e.key === 'ArrowLeft' || e.key === 'PageUp') { e.preventDefault(); go(i - 1); }
+    else if (e.key === 'Home') go(0);
+    else if (e.key === 'End') go(n - 1);
+  });
+  prev.addEventListener('click', function () { go(i - 1); });
+  next.addEventListener('click', function () { go(i + 1); });
+
+  // Drag / swipe (mouse, touch and pen)
+  var sx = 0, t0 = 0, down = false, moved = false;
+  stage.addEventListener('pointerdown', function (e) {
+    if (e.pointerType === 'mouse' && e.button !== 0) return;
+    down = true; moved = false; sx = e.clientX; t0 = performance.now();
+  });
+  window.addEventListener('pointermove', function (e) {
+    if (!down) return;
+    var d = e.clientX - sx;
+    if (!moved && Math.abs(d) < 6) return;
+    moved = true;
+    track.classList.add('drag'); stage.classList.add('dragging');
+    if ((i === 0 && d > 0) || (i === n - 1 && d < 0)) d *= 0.3; // soft edge
+    dx = d; render();
+  });
+  function end() {
+    if (!down) return;
+    down = false; stage.classList.remove('dragging');
+    if (!moved) return;
+    var dt = Math.max(1, performance.now() - t0), v = dx / dt;
+    var far = Math.abs(dx) > window.innerWidth * 0.15, fast = Math.abs(v) > 0.5 && Math.abs(dx) > 40;
+    var k = i;
+    if ((far || fast) && dx < 0) k = i + 1;
+    else if ((far || fast) && dx > 0) k = i - 1;
+    go(k);
+  }
+  window.addEventListener('pointerup', end);
+  window.addEventListener('pointercancel', end);
+
+  // Trackpad horizontal scroll
+  var lock = false;
+  stage.addEventListener('wheel', function (e) {
+    if (Math.abs(e.deltaX) > Math.abs(e.deltaY) && Math.abs(e.deltaX) > 30) {
+      e.preventDefault();
+      if (lock) return;
+      lock = true; go(i + (e.deltaX > 0 ? 1 : -1));
+      setTimeout(function () { lock = false; }, 700);
+    }
+  }, { passive: false });
+
+  window.addEventListener('resize', function () { scale(); track.classList.add('drag'); render(); });
+  scale(); render();
+})();
+</script>
+</body>
+</html>
